@@ -1,6 +1,7 @@
 import express from "express";
 import UserModel from '../models/user.model';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 
 class AuthController {
     public signup(req: express.Request, res: express.Response) {
@@ -9,7 +10,7 @@ class AuthController {
             res.json({message: `Vous devez entrer une adresse email et un mot de passe.` });
             return;
         }
-        if (req.body.password.length >= 8 && req.body.password.length <= 30) {
+        if (req.body.password.length < 8 || req.body.password.length > 30) {
             res.status(400);
             res.json({message: `Votre mot de passe doit contenir entre 8 et 30 caractères.` });
             return;
@@ -38,13 +39,39 @@ class AuthController {
                         res.status(400);
                         res.json({message: error});
                     })
-            }).catch((error) => {
+            }).catch((error: mongoose.Error) => {
                 res.status(400);
                 res.json({message: error});
         });
     }
     public login(req: express.Request, res: express.Response) {
-        res.send('ok');
+        if (!req.body.email || !req.body.password) {
+            res.status(400);
+            res.json({message: `Vous devez entrer une adresse email et un mot de passe.` });
+            return;
+        }
+        UserModel.findOne({email: req.body.email})
+            .then((user: any) => {
+                if (!user) {
+                    res.status(401);
+                    res.json({message: `Adresse email introuvable.`});
+                    return;
+                }
+                user.comparePassword(req.body.password, (err: any, isMatch: any) => {
+                    if (isMatch && !err) {
+                        // @ts-ignore
+                        const token = jwt.sign(user.toJSON(), process.env.SECRET_JWT);
+                        res.status(200);
+                        res.json({userId: user._id, token});
+                    } else {
+                        res.status(401);
+                        res.json({message: 'Mot de passe incorrect.'});
+                    }
+                });
+            }).catch((error: mongoose.Error) => {
+                res.status(400);
+                res.json({message: error});
+        });
     }
 }
 
