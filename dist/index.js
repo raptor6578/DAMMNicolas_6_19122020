@@ -27,6 +27,7 @@ var body_parser_1 = __importDefault(require("body-parser"));
 var dotenv = __importStar(require("dotenv"));
 var mongoose_1 = __importDefault(require("mongoose"));
 var auth_route_1 = __importDefault(require("./routes/auth.route"));
+var sauces_route_1 = __importDefault(require("./routes/sauces.route"));
 dotenv.config();
 var app = express_1.default();
 var expressPort = process.env.EXPRESS_PORT || 3000;
@@ -50,3 +51,4 @@ app.use(function (req, res, next) {
     next();
 });
 app.use('/api/auth', auth_route_1.default.router);
+app.use('/api/sauces', sauces_route_1.default.router);

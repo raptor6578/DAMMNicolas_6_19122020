@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
 import authRoutes from './routes/auth.route';
+import saucesRoutes from './routes/sauces.route';
 
 dotenv.config();
 const app = express();
@@ -33,3 +34,5 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
 });
 
 app.use('/api/auth', authRoutes.router);
+app.use('/api/sauces', saucesRoutes.router);
+
