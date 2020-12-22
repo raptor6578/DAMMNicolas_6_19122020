@@ -25,6 +25,7 @@ mongoose.connect(`mongodb://${mongodbHost}:${mongodbPort}/${mongodbDatabase}`, {
     .catch(() => console.log('Connexion à la base de données echouée !'));
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
    res.setHeader('Access-Control-Allow-Origin', '*');

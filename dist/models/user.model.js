@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var mongoose_1 = __importDefault(require("mongoose"));
 var bcrypt_1 = __importDefault(require("bcrypt"));
-var memberSchema = new mongoose_1.default.Schema({
+var userSchema = new mongoose_1.default.Schema({
     email: {
         type: String,
         required: true,
@@ -15,12 +15,18 @@ var memberSchema = new mongoose_1.default.Schema({
         type: String,
         required: true,
     },
+    sauces: [
+        {
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: 'Sauce',
+        }
+    ],
     date: {
         type: Date,
         default: Date.now,
     },
 });
-memberSchema.pre('save', function (next) {
+userSchema.pre('save', function (next) {
     var user = this;
     if (this.isModified('password') || user.isNew) {
         bcrypt_1.default.genSalt(10, function (err, salt) {
@@ -40,7 +46,7 @@ memberSchema.pre('save', function (next) {
         return next();
     }
 });
-memberSchema.methods.comparePassword = function (pw, cb) {
+userSchema.methods.comparePassword = function (pw, cb) {
     var user = this;
     bcrypt_1.default.compare(pw, user.password, function (err, isMatch) {
         if (err) {
@@ -49,4 +55,4 @@ memberSchema.methods.comparePassword = function (pw, cb) {
         cb(null, isMatch);
     });
 };
-exports.default = mongoose_1.default.model('User', memberSchema);
+exports.default = mongoose_1.default.model('User', userSchema);

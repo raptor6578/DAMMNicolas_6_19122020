@@ -44,6 +44,7 @@ mongoose_1.default.connect("mongodb://" + mongodbHost + ":" + mongodbPort + "/" 
     .then(function () { return console.log("Connexion r\u00E9ussie \u00E0 la base de donn\u00E9es mongodb://" + mongodbHost + ":" + mongodbPort + "/" + mongodbDatabase); })
     .catch(function () { return console.log('Connexion à la base de données echouée !'); });
 app.use(body_parser_1.default.json());
+app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
-const memberSchema: mongoose.Schema = new mongoose.Schema({
+const userSchema: mongoose.Schema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
@@ -11,6 +11,12 @@ const memberSchema: mongoose.Schema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    sauces: [
+        {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Sauce',
+        }
+    ],
     date: {
         type: Date,
         default: Date.now,
@@ -18,7 +24,7 @@ const memberSchema: mongoose.Schema = new mongoose.Schema({
 });
 
 
-memberSchema.pre('save', function(next) {
+userSchema.pre('save', function(next) {
     const user: any = this;
     if (this.isModified('password') || user.isNew) {
         bcrypt.genSalt(10, (err, salt) => {
@@ -38,7 +44,7 @@ memberSchema.pre('save', function(next) {
     }
 });
 
-memberSchema.methods.comparePassword = function(pw: any, cb: any) {
+userSchema.methods.comparePassword = function(pw: any, cb: any) {
     const user: any = this;
     bcrypt.compare(pw, user.password, (err, isMatch) => {
         if (err) {
@@ -49,4 +55,4 @@ memberSchema.methods.comparePassword = function(pw: any, cb: any) {
 };
 
 
-export default mongoose.model('User', memberSchema);
+export default mongoose.model('User', userSchema);

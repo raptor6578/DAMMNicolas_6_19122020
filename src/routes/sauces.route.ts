@@ -1,6 +1,7 @@
 import express from 'express';
 import saucesController from '../controllers/sauces.controller';
 import auth from '../middleware/auth.middleware';
+import multer from '../middleware/multer.middleware';
 
 class SaucesRoute {
     router: express.Router;
@@ -9,7 +10,8 @@ class SaucesRoute {
         this.initializeRoutes();
     }
     private initializeRoutes() {
-        this.router.get('/', auth, saucesController.sauces);
+        this.router.get('/', auth, saucesController.getAllSauces);
+        this.router.post('/', auth, multer, saucesController.addSauce);
     }
 }
 
