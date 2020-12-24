@@ -51,5 +51,6 @@ app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
 });
+app.use('/images', express_1.default.static('images'));
 app.use('/api/auth', auth_route_1.default.router);
 app.use('/api/sauces', sauces_route_1.default.router);

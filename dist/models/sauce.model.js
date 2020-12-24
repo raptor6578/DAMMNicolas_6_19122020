@@ -55,6 +55,13 @@ var sauceSchema = new mongoose_1.default.Schema({
         type: Date,
         default: Date.now,
     },
+}, {
+    toObject: {
+        virtuals: true
+    },
+    toJSON: {
+        virtuals: true
+    }
 });
 sauceSchema.virtual('user', {
     ref: 'User',

@@ -34,6 +34,7 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
    next();
 });
 
+app.use('/images', express.static('images'));
 app.use('/api/auth', authRoutes.router);
 app.use('/api/sauces', saucesRoutes.router);
 

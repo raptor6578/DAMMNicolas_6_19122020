@@ -15,6 +15,8 @@ var SaucesRoute = /** @class */ (function () {
     SaucesRoute.prototype.initializeRoutes = function () {
         this.router.get('/', auth_middleware_1.default, sauces_controller_1.default.getAllSauces);
         this.router.post('/', auth_middleware_1.default, multer_middleware_1.default, sauces_controller_1.default.addSauce);
+        this.router.get('/:id', auth_middleware_1.default, sauces_controller_1.default.getSauceById);
+        this.router.post('/:id/like', auth_middleware_1.default, sauces_controller_1.default.like);
     };
     return SaucesRoute;
 }());

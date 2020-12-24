@@ -12,6 +12,8 @@ class SaucesRoute {
     private initializeRoutes() {
         this.router.get('/', auth, saucesController.getAllSauces);
         this.router.post('/', auth, multer, saucesController.addSauce);
+        this.router.get('/:id', auth, saucesController.getSauceById);
+        this.router.post('/:id/like', auth, saucesController.like);
     }
 }
 
