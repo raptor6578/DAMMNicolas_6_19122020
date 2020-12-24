@@ -3,6 +3,7 @@ import SauceModel from '../models/sauce.model';
 import UserModel from '../models/user.model';
 import LikeModel from '../models/like.model';
 import mongoose from "mongoose";
+import fs from "fs";
 
 class SaucesController {
     public getAllSauces(req: express.Request, res: express.Response) {
@@ -47,6 +48,28 @@ class SaucesController {
                 });
             });
     }
+    public deleteSauceById(req: express.Request, res: express.Response) {
+        SauceModel.findOne({_id: req.params.id, userId: res.locals.userId})
+            .then((data: any) => {
+               if (!data) {
+                   res.status(404);
+                   return res.json({message: `La sauce n'éxiste pas ou vous n'en êtes pas son publicateur.`});
+               }
+                fs.unlink(`images/${data.image}`, () => {
+                    SauceModel.deleteOne({_id: req.params.id, userId: res.locals.userId})
+                        .then(() => {
+                            LikeModel.deleteMany({sauceId: { $in: data._id }}).then();
+                            LikeModel.deleteMany({sauceId: { $in: data._id }}).then();
+                            res.status(201);
+                            return res.json({message: `Votre sauce a bien été supprimée.`});
+                        })
+                        .catch((error: mongoose.Error) => {
+                            res.status(400);
+                            res.json({message: error});
+                        });
+                });
+            });
+    }
     public like(req: express.Request, res: express.Response) {
         const likeSauce = (data: any, create: boolean, oldLike?: number) => {
             if (req.body.like === 1) {
@@ -79,7 +102,7 @@ class SaucesController {
             .then((sauce: any) => {
                 if (!sauce) {
                     res.status(404);
-                    res.json({message: `La sauce n'éxiste pas.`});
+                    return res.json({message: `La sauce n'éxiste pas.`});
                 }
                 LikeModel.findOne({userId: req.body.userId, sauceId: req.params.id})
                     .then((data: any) => {

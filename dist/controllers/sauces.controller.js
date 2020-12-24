@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var sauce_model_1 = __importDefault(require("../models/sauce.model"));
 var user_model_1 = __importDefault(require("../models/user.model"));
 var like_model_1 = __importDefault(require("../models/like.model"));
+var fs_1 = __importDefault(require("fs"));
 var SaucesController = /** @class */ (function () {
     function SaucesController() {
     }
@@ -53,6 +54,28 @@ var SaucesController = /** @class */ (function () {
             });
         });
     };
+    SaucesController.prototype.deleteSauceById = function (req, res) {
+        sauce_model_1.default.findOne({ _id: req.params.id, userId: res.locals.userId })
+            .then(function (data) {
+            if (!data) {
+                res.status(404);
+                return res.json({ message: "La sauce n'\u00E9xiste pas ou vous n'en \u00EAtes pas son publicateur." });
+            }
+            fs_1.default.unlink("images/" + data.image, function () {
+                sauce_model_1.default.deleteOne({ _id: req.params.id, userId: res.locals.userId })
+                    .then(function () {
+                    like_model_1.default.deleteMany({ sauceId: { $in: data._id } }).then();
+                    like_model_1.default.deleteMany({ sauceId: { $in: data._id } }).then();
+                    res.status(201);
+                    return res.json({ message: "Votre sauce a bien \u00E9t\u00E9 supprim\u00E9e." });
+                })
+                    .catch(function (error) {
+                    res.status(400);
+                    res.json({ message: error });
+                });
+            });
+        });
+    };
     SaucesController.prototype.like = function (req, res) {
         var likeSauce = function (data, create, oldLike) {
             if (req.body.like === 1) {
@@ -85,7 +108,7 @@ var SaucesController = /** @class */ (function () {
             .then(function (sauce) {
             if (!sauce) {
                 res.status(404);
-                res.json({ message: "La sauce n'\u00E9xiste pas." });
+                return res.json({ message: "La sauce n'\u00E9xiste pas." });
             }
             like_model_1.default.findOne({ userId: req.body.userId, sauceId: req.params.id })
                 .then(function (data) {

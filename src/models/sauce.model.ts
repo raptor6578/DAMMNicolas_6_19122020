@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import LikeModel from './like.model';
 
 const sauceSchema: mongoose.Schema = new mongoose.Schema({
     userId: {
@@ -39,12 +40,14 @@ const sauceSchema: mongoose.Schema = new mongoose.Schema({
     },
     usersLiked: [
         {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Like"
         }
     ],
     usersDisliked: [
         {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Like"
         }
     ],
     date: {

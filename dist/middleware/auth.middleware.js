@@ -10,8 +10,8 @@ function default_1(req, res, next) {
             var token = req.headers.authorization.split(' ')[1];
             // @ts-ignore
             var decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_JWT);
-            var userId = decodedToken._id;
-            if (req.body.userId && req.body.userId !== userId) {
+            res.locals.userId = decodedToken._id;
+            if (req.body.userId && req.body.userId !== res.locals.userId) {
                 res.status(401);
                 return res.json({ message: "Vous n'\u00EAtes pas autoris\u00E9 \u00E0 utiliser cet ID." });
             }
