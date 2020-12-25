@@ -18,6 +18,10 @@ var SaucesController = /** @class */ (function () {
                 data[key].imageUrl = req.protocol + "://" + req.get('host') + "/images/" + data[key].image;
             }
             res.json(data);
+        })
+            .catch(function (error) {
+            res.status(400);
+            res.json({ message: error });
         });
     };
     SaucesController.prototype.getSauceById = function (req, res) {
@@ -51,9 +55,21 @@ var SaucesController = /** @class */ (function () {
                     user.save().then(function () {
                         res.status(201);
                         res.json({ message: "Votre sauce a bien \u00E9t\u00E9 enregistr\u00E9e." });
+                    })
+                        .catch(function (error) {
+                        res.status(400);
+                        res.json({ message: error });
                     });
+                })
+                    .catch(function (error) {
+                    res.status(400);
+                    res.json({ message: error });
                 });
             }
+        })
+            .catch(function (error) {
+            res.status(400);
+            res.json({ message: error });
         });
     };
     SaucesController.prototype.deleteSauceById = function (req, res) {
@@ -61,7 +77,7 @@ var SaucesController = /** @class */ (function () {
             .then(function (data) {
             if (!data) {
                 res.status(404);
-                return res.json({ message: "La sauce n'\u00E9xiste pas ou vous n'en \u00EAtes pas son publicateur." });
+                return res.json({ message: "La sauce n'\u00E9xiste pas ou vous n'en \u00EAtes pas son autheur." });
             }
             fs_1.default.unlink("images/" + data.image, function () {
                 sauce_model_1.default.deleteOne({ _id: req.params.id, userId: res.locals.userId })
@@ -76,6 +92,43 @@ var SaucesController = /** @class */ (function () {
                     res.json({ message: error });
                 });
             });
+        });
+    };
+    SaucesController.prototype.editSauceById = function (req, res) {
+        sauce_model_1.default.findOne({ _id: req.params.id, userId: res.locals.userId })
+            .then(function (sauce) {
+            if (!sauce) {
+                res.status(404);
+                return res.json({ message: "La sauce n'\u00E9xiste pas ou vous n'en \u00EAtes pas son autheur." });
+            }
+            if (req.file) {
+                var bodySauce = JSON.parse(req.body.sauce);
+                for (var _i = 0, _a = Object.keys(bodySauce); _i < _a.length; _i++) {
+                    var key = _a[_i];
+                    sauce[key] = bodySauce[key];
+                }
+                fs_1.default.unlink("images/" + sauce.image, function () { return; });
+                sauce.image = req.file.filename;
+            }
+            else {
+                for (var _b = 0, _c = Object.keys(req.body); _b < _c.length; _b++) {
+                    var key = _c[_b];
+                    sauce[key] = req.body[key];
+                }
+            }
+            sauce.save()
+                .then(function () {
+                res.status(200);
+                return res.json({ message: 'Votre sauce a bien été modifié. (1)' });
+            })
+                .catch(function (error) {
+                res.status(400);
+                return res.json({ message: error });
+            });
+        })
+            .catch(function (error) {
+            res.status(400);
+            res.json({ message: error });
         });
     };
     SaucesController.prototype.like = function (req, res) {

@@ -55,17 +55,20 @@ var AuthController = /** @class */ (function () {
                 res.status(401);
                 return res.json({ message: "Adresse email introuvable." });
             }
-            user.comparePassword(req.body.password, function (err, isMatch) {
-                if (isMatch && !err) {
-                    // @ts-ignore
-                    var token = jsonwebtoken_1.default.sign(user.toJSON(), process.env.SECRET_JWT, { expiresIn: '24h' });
-                    res.status(200);
-                    res.json({ userId: user._id, token: token });
-                }
-                else {
+            user.comparePassword(req.body.password)
+                .then(function (isMatch) {
+                if (!isMatch) {
                     res.status(401);
-                    res.json({ message: 'Mot de passe incorrect.' });
+                    return res.json({ message: 'Mot de passe incorrect.' });
                 }
+                // @ts-ignore
+                var token = jsonwebtoken_1.default.sign(user.toJSON(), process.env.SECRET_JWT, { expiresIn: '24h' });
+                res.status(200);
+                res.json({ userId: user._id, token: token });
+            })
+                .catch(function (error) {
+                res.status(500);
+                res.json({ message: error });
             });
         }).catch(function (error) {
             res.status(500);

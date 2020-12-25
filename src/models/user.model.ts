@@ -7,7 +7,7 @@ export interface IUser extends mongoose.Document {
     password: string
     sauces: mongoose.Types.DocumentArray<ISauce>
     date: Date
-    comparePassword(pw: string, cb: any): void
+    comparePassword(password: string): Promise<boolean>
 }
 
 const userSchema: mongoose.Schema = new mongoose.Schema({
@@ -32,7 +32,6 @@ const userSchema: mongoose.Schema = new mongoose.Schema({
     },
 });
 
-
 userSchema.pre('save', function(next) {
     const user: any = this;
     if (this.isModified('password') || user.isNew) {
@@ -53,14 +52,9 @@ userSchema.pre('save', function(next) {
     }
 });
 
-userSchema.methods.comparePassword = function(pw: string, cb: any) {
+userSchema.methods.comparePassword = function(password: string) {
     const user = this;
-    bcrypt.compare(pw, user.password, (err, isMatch) => {
-        if (err) {
-            return cb(err);
-        }
-        cb(null, isMatch);
-    })
+    return bcrypt.compare(password, user.password);
 };
 
 

@@ -51,17 +51,21 @@ class AuthController {
                     res.status(401);
                     return res.json({message: `Adresse email introuvable.`});
                 }
-                user.comparePassword(req.body.password, (err: any, isMatch: any) => {
-                    if (isMatch && !err) {
+                user.comparePassword(req.body.password)
+                    .then((isMatch) => {
+                        if (!isMatch) {
+                            res.status(401);
+                            return res.json({message: 'Mot de passe incorrect.'});
+                        }
                         // @ts-ignore
                         const token = jwt.sign(user.toJSON(), process.env.SECRET_JWT, {expiresIn: '24h'});
                         res.status(200);
                         res.json({userId: user._id, token});
-                    } else {
-                        res.status(401);
-                        res.json({message: 'Mot de passe incorrect.'});
-                    }
-                });
+                    })
+                    .catch(error => {
+                        res.status(500);
+                        res.json({message: error});
+                    })
             }).catch((error: mongoose.Error) => {
                 res.status(500);
                 res.json({message: error});

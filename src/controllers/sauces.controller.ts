@@ -14,6 +14,10 @@ class SaucesController {
                 }
                 res.json(data);
             })
+            .catch((error: mongoose.Error) => {
+                res.status(400);
+                res.json({message: error});
+            })
     }
     public getSauceById(req: express.Request, res: express.Response) {
         SauceModel.findById(req.params.id).lean()
@@ -45,9 +49,21 @@ class SaucesController {
                         user.save().then(() => {
                             res.status(201);
                             res.json({message: `Votre sauce a bien été enregistrée.`});
+                        })
+                        .catch((error: mongoose.Error) => {
+                            res.status(400);
+                            res.json({message: error});
                         });
+                    })
+                    .catch((error: mongoose.Error) => {
+                        res.status(400);
+                        res.json({message: error});
                     });
                 }
+            })
+            .catch((error: mongoose.Error) => {
+                res.status(400);
+                res.json({message: error});
             });
     }
     public deleteSauceById(req: express.Request, res: express.Response) {
@@ -55,7 +71,7 @@ class SaucesController {
             .then((data) => {
                if (!data) {
                    res.status(404);
-                   return res.json({message: `La sauce n'éxiste pas ou vous n'en êtes pas son publicateur.`});
+                   return res.json({message: `La sauce n'éxiste pas ou vous n'en êtes pas son autheur.`});
                }
                 fs.unlink(`images/${data.image}`, () => {
                     SauceModel.deleteOne({_id: req.params.id, userId: res.locals.userId})
@@ -70,6 +86,40 @@ class SaucesController {
                             res.json({message: error});
                         });
                 });
+            });
+    }
+    public editSauceById(req: express.Request, res: express.Response) {
+        SauceModel.findOne({_id: req.params.id, userId: res.locals.userId})
+            .then((sauce: any) => {
+                if (!sauce) {
+                    res.status(404);
+                    return res.json({message: `La sauce n'éxiste pas ou vous n'en êtes pas son autheur.`});
+                }
+                if (req.file) {
+                    const bodySauce = JSON.parse(req.body.sauce);
+                    for (const key of Object.keys(bodySauce)) {
+                        sauce[key] = bodySauce[key];
+                    }
+                    fs.unlink(`images/${sauce.image}`, () => { return; });
+                    sauce.image = req.file.filename;
+                } else {
+                    for (const key of Object.keys(req.body)) {
+                        sauce[key] = req.body[key];
+                    }
+                }
+                sauce.save()
+                    .then(() => {
+                        res.status(200);
+                        return res.json({message: 'Votre sauce a bien été modifié. (1)'});
+                    })
+                    .catch((error: mongoose.Error) => {
+                        res.status(400);
+                        return res.json({message: error});
+                    });
+            })
+            .catch((error: mongoose.Error) => {
+                res.status(400);
+                res.json({message: error});
             });
     }
     public like(req: express.Request, res: express.Response) {

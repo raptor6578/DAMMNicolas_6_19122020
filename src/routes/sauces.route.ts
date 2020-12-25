@@ -13,6 +13,7 @@ class SaucesRoute {
         this.router.get('/', auth, saucesController.getAllSauces);
         this.router.post('/', auth, multer, saucesController.addSauce);
         this.router.get('/:id', auth, saucesController.getSauceById);
+        this.router.put('/:id', auth, multer, saucesController.editSauceById);
         this.router.delete('/:id', auth, saucesController.deleteSauceById);
         this.router.post('/:id/like', auth, saucesController.like);
     }
