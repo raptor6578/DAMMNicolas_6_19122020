@@ -1,5 +1,11 @@
 import mongoose from 'mongoose';
 
+export interface ILike extends mongoose.Document {
+    userId: string
+    sauceId: string
+    like: number
+}
+
 const likeSchema: mongoose.Schema = new mongoose.Schema({
     userId: {
         type: String,
@@ -15,4 +21,4 @@ const likeSchema: mongoose.Schema = new mongoose.Schema({
     }
 });
 
-export default mongoose.model('Like', likeSchema);
+export default mongoose.model<ILike>('Like', likeSchema);

@@ -23,7 +23,7 @@ class AuthController {
                     res.status(409);
                     return res.json({message: `Un compte utilisant l'adresse email que vous avez entré existe déjà.`});
                 }
-                const user: any  = new UserModel();
+                const user  = new UserModel();
                 user.email = req.body.email;
                 user.password = req.body.password;
                 user.save()
@@ -46,7 +46,7 @@ class AuthController {
             return res.json({message: `Vous devez entrer une adresse email et un mot de passe.` });
         }
         UserModel.findOne({email: req.body.email})
-            .then((user: any) => {
+            .then((user) => {
                 if (!user) {
                     res.status(401);
                     return res.json({message: `Adresse email introuvable.`});

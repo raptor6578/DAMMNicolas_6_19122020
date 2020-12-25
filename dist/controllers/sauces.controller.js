@@ -39,19 +39,21 @@ var SaucesController = /** @class */ (function () {
         var formData = JSON.parse(req.body.sauce);
         user_model_1.default.findById(formData.userId)
             .then(function (user) {
-            var sauce = new sauce_model_1.default();
-            for (var _i = 0, _a = Object.keys(formData); _i < _a.length; _i++) {
-                var key = _a[_i];
-                sauce[key] = formData[key];
-            }
-            sauce.image = req.file.filename;
-            user.sauces.push(sauce);
-            sauce.save().then(function () {
-                user.save().then(function () {
-                    res.status(201);
-                    res.json({ message: "Votre sauce a bien \u00E9t\u00E9 enregistr\u00E9e." });
+            if (user) {
+                var sauce = new sauce_model_1.default();
+                for (var _i = 0, _a = Object.keys(formData); _i < _a.length; _i++) {
+                    var key = _a[_i];
+                    sauce[key] = formData[key];
+                }
+                sauce.image = req.file.filename;
+                user.sauces.push(sauce);
+                sauce.save().then(function () {
+                    user.save().then(function () {
+                        res.status(201);
+                        res.json({ message: "Votre sauce a bien \u00E9t\u00E9 enregistr\u00E9e." });
+                    });
                 });
-            });
+            }
         });
     };
     SaucesController.prototype.deleteSauceById = function (req, res) {

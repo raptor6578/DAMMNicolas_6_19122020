@@ -1,5 +1,20 @@
 import mongoose from 'mongoose';
-import LikeModel from './like.model';
+import {IUser} from "./user.model";
+
+export interface ISauce extends mongoose.Document {
+    userId: string
+    manufacturer: string
+    description: string
+    mainPepper: string
+    image: string
+    imageUrl: string
+    heat: number
+    likes: number
+    dislikes: number
+    usersLiked: mongoose.Types.DocumentArray<IUser>
+    usersDisliked: mongoose.Types.DocumentArray<IUser>
+    date: Date
+}
 
 const sauceSchema: mongoose.Schema = new mongoose.Schema({
     userId: {
@@ -69,4 +84,4 @@ sauceSchema.virtual('user', {
     foreignField: 'sauces',
 });
 
-export default mongoose.model('Sauce', sauceSchema);
+export default mongoose.model<ISauce>('Sauce', sauceSchema);

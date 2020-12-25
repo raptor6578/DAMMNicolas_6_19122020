@@ -1,5 +1,5 @@
 import express from "express";
-import SauceModel from '../models/sauce.model';
+import SauceModel, {ISauce} from '../models/sauce.model';
 import UserModel from '../models/user.model';
 import LikeModel from '../models/like.model';
 import mongoose from "mongoose";
@@ -17,7 +17,7 @@ class SaucesController {
     }
     public getSauceById(req: express.Request, res: express.Response) {
         SauceModel.findById(req.params.id).lean()
-            .then((data: any) => {
+            .then((data: ISauce) => {
                 data.imageUrl = `${req.protocol}://${req.get('host')}/images/${data.image}`;
                 res.json(data);
             })
@@ -33,24 +33,26 @@ class SaucesController {
         }
         const formData = JSON.parse(req.body.sauce);
         UserModel.findById(formData.userId)
-            .then((user: any) => {
-                const sauce: any = new SauceModel();
-                for (const key of Object.keys(formData)) {
-                    sauce[key] = formData[key]
-                }
-                sauce.image = req.file.filename;
-                user.sauces.push(sauce);
-                sauce.save().then(() => {
-                    user.save().then(() => {
-                        res.status(201);
-                        res.json({message: `Votre sauce a bien été enregistrée.`});
+            .then((user) => {
+                if (user) {
+                    const sauce: any = new SauceModel();
+                    for (const key of Object.keys(formData)) {
+                        sauce[key] = formData[key]
+                    }
+                    sauce.image = req.file.filename;
+                    user.sauces.push(sauce);
+                    sauce.save().then(() => {
+                        user.save().then(() => {
+                            res.status(201);
+                            res.json({message: `Votre sauce a bien été enregistrée.`});
+                        });
                     });
-                });
+                }
             });
     }
     public deleteSauceById(req: express.Request, res: express.Response) {
         SauceModel.findOne({_id: req.params.id, userId: res.locals.userId})
-            .then((data: any) => {
+            .then((data) => {
                if (!data) {
                    res.status(404);
                    return res.json({message: `La sauce n'éxiste pas ou vous n'en êtes pas son publicateur.`});
@@ -71,7 +73,7 @@ class SaucesController {
             });
     }
     public like(req: express.Request, res: express.Response) {
-        const likeSauce = (data: any, create: boolean, oldLike?: number) => {
+        const likeSauce = (data: ISauce, create: boolean, oldLike?: number) => {
             if (req.body.like === 1) {
                 if (!create) {
                     data.usersDisliked.pull(req.body.userId);
@@ -99,15 +101,15 @@ class SaucesController {
             data.save().then();
         };
         SauceModel.findById(req.params.id)
-            .then((sauce: any) => {
+            .then((sauce) => {
                 if (!sauce) {
                     res.status(404);
                     return res.json({message: `La sauce n'éxiste pas.`});
                 }
                 LikeModel.findOne({userId: req.body.userId, sauceId: req.params.id})
-                    .then((data: any) => {
+                    .then((data) => {
                        if (!data) {
-                           const like: any = new LikeModel();
+                           const like = new LikeModel();
                            like.userId = req.body.userId;
                            like.sauceId = req.params.id;
                            like.like = req.body.like;

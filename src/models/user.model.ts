@@ -1,5 +1,14 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
+import {ISauce} from "./sauce.model";
+
+export interface IUser extends mongoose.Document {
+    email: string
+    password: string
+    sauces: mongoose.Types.DocumentArray<ISauce>
+    date: Date
+    comparePassword(pw: string, cb: any): void
+}
 
 const userSchema: mongoose.Schema = new mongoose.Schema({
     email: {
@@ -44,8 +53,8 @@ userSchema.pre('save', function(next) {
     }
 });
 
-userSchema.methods.comparePassword = function(pw: any, cb: any) {
-    const user: any = this;
+userSchema.methods.comparePassword = function(pw: string, cb: any) {
+    const user = this;
     bcrypt.compare(pw, user.password, (err, isMatch) => {
         if (err) {
             return cb(err);
@@ -55,4 +64,4 @@ userSchema.methods.comparePassword = function(pw: any, cb: any) {
 };
 
 
-export default mongoose.model('User', userSchema);
+export default mongoose.model<IUser>('User', userSchema);
