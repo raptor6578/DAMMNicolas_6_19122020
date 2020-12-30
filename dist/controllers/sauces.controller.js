@@ -119,7 +119,7 @@ var SaucesController = /** @class */ (function () {
             sauce.save()
                 .then(function () {
                 res.status(200);
-                return res.json({ message: 'Votre sauce a bien été modifié. (1)' });
+                return res.json({ message: 'Votre sauce a bien été modifiée. (1)' });
             })
                 .catch(function (error) {
                 res.status(400);

@@ -29,28 +29,43 @@ var mongoose_1 = __importDefault(require("mongoose"));
 var auth_route_1 = __importDefault(require("./routes/auth.route"));
 var sauces_route_1 = __importDefault(require("./routes/sauces.route"));
 dotenv.config();
-var app = express_1.default();
-var expressPort = process.env.EXPRESS_PORT || 3000;
-var mongodbHost = process.env.MONGODB_HOST || 'localhost';
-var mongodbPort = process.env.MONGODB_PORT || 27017;
-var mongodbDatabase = process.env.MONGODB_DATABASE || 'piquante';
-app.listen(expressPort, function () {
-    console.log("Le serveur vient de d\u00E9marrer sur le port " + expressPort + ".");
-});
-mongoose_1.default.connect("mongodb://" + mongodbHost + ":" + mongodbPort + "/" + mongodbDatabase, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-    .then(function () { return console.log("Connexion r\u00E9ussie \u00E0 la base de donn\u00E9es mongodb://" + mongodbHost + ":" + mongodbPort + "/" + mongodbDatabase); })
-    .catch(function () { return console.log('Connexion à la base de données echouée !'); });
-app.use(body_parser_1.default.json());
-app.use(body_parser_1.default.urlencoded({ extended: true }));
-app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    next();
-});
-app.use('/images', express_1.default.static('images'));
-app.use('/api/auth', auth_route_1.default.router);
-app.use('/api/sauces', sauces_route_1.default.router);
+if (process.env.EXPRESS_PORT &&
+    process.env.MONGODB_HOST &&
+    process.env.MONGODB_PORT &&
+    process.env.MONGODB_DATABASE &&
+    process.env.MONGODB_USER &&
+    process.env.MONGODB_PASSWORD &&
+    process.env.SECRET_JWT) {
+    var config_1 = {
+        expressPort: process.env.EXPRESS_PORT,
+        mongodbHost: process.env.MONGODB_HOST,
+        mongodbPort: process.env.MONGODB_PORT,
+        mongodbDatabase: process.env.MONGODB_DATABASE,
+        mongodbUser: process.env.MONGODB_USER,
+        mongodbPassword: process.env.MONGODB_PASSWORD
+    };
+    var app = express_1.default();
+    app.listen(config_1.expressPort, function () {
+        console.log("Le serveur vient de d\u00E9marrer sur le port " + config_1.expressPort + ".");
+    });
+    mongoose_1.default.connect("mongodb://" + config_1.mongodbUser + ":" + config_1.mongodbPassword + "@" + config_1.mongodbHost + ":" + config_1.mongodbPort + "/" + config_1.mongodbDatabase, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+        .then(function () { return console.log("Connexion r\u00E9ussie \u00E0 la base de donn\u00E9es mongodb://" + config_1.mongodbHost + ":" + config_1.mongodbPort + "/" + config_1.mongodbDatabase); })
+        .catch(function () { return console.log('Connexion à la base de données echouée !'); });
+    app.use(body_parser_1.default.json());
+    app.use(body_parser_1.default.urlencoded({ extended: true }));
+    app.use(function (req, res, next) {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+        next();
+    });
+    app.use('/images', express_1.default.static('images'));
+    app.use('/api/auth', auth_route_1.default.router);
+    app.use('/api/sauces', sauces_route_1.default.router);
+}
+else {
+    console.log("Le fichier de configuration \".env\" se trouvant \u00E0 la racine du projet est incomplet, il doit contenir les champs suivants:\n   EXPRESS_PORT, MONGODB_HOST, MONGODB_PORT, MONGODB_DATABASE, MONGODB_USER, MONGODB_PASSWORD, SECRET_JWT");
+}

@@ -110,7 +110,7 @@ class SaucesController {
                 sauce.save()
                     .then(() => {
                         res.status(200);
-                        return res.json({message: 'Votre sauce a bien été modifié. (1)'});
+                        return res.json({message: 'Votre sauce a bien été modifiée. (1)'});
                     })
                     .catch((error: mongoose.Error) => {
                         res.status(400);
