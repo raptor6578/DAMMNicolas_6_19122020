@@ -13,6 +13,6 @@ Modifiez les variables d'environnement suivantes dans le fichier ".env"
 - MONGODB_PASSWORD=
 - SECRET_JWT=
 
-##Démarrer le serveur de développement
+## Démarrer le serveur de développement
 - npm run dev
 - L'API sera disponible à partir de l'host et du port que vous aurez configuré dans le fichier ".env"
