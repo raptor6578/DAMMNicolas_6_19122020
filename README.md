@@ -12,6 +12,7 @@ Modifiez les variables d'environnement suivantes dans le fichier ".env"
 - MONGODB_USER=
 - MONGODB_PASSWORD=
 - SECRET_JWT=
+- ALLOW_ORIGIN=
 
 ## Démarrer le serveur de développement
 - npm run dev
